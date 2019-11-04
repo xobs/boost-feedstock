@@ -159,10 +159,12 @@ outputs:
         - if not exist %PREFIX%\\Library\\bin\\boost_{{ each_py_boost_lib }}35-vc{{ vc }}0-mt-{{ win_astr }}-{{ win_vstr_mm }}.dll exit 1  # [win and py==35]
         - if not exist %PREFIX%\\Library\\bin\\boost_{{ each_py_boost_lib }}36-vc{{ vc }}0-mt-{{ win_astr }}-{{ win_vstr_mm }}.dll exit 1  # [win and py==36]
         - if not exist %PREFIX%\\Library\\bin\\boost_{{ each_py_boost_lib }}37-vc{{ vc }}0-mt-{{ win_astr }}-{{ win_vstr_mm }}.dll exit 1  # [win and py==37]
+        - if not exist %PREFIX%\\Library\\bin\\boost_{{ each_py_boost_lib }}38-vc{{ vc }}0-mt-{{ win_astr }}-{{ win_vstr_mm }}.dll exit 1  # [win and py==38]
         - if not exist %PREFIX%\\Library\\lib\\boost_{{ each_py_boost_lib }}27-vc{{ vc }}0-mt-{{ win_astr }}-{{ win_vstr_mm }}.lib exit 1  # [win and py==27]
         - if not exist %PREFIX%\\Library\\lib\\boost_{{ each_py_boost_lib }}35-vc{{ vc }}0-mt-{{ win_astr }}-{{ win_vstr_mm }}.lib exit 1  # [win and py==35]
         - if not exist %PREFIX%\\Library\\lib\\boost_{{ each_py_boost_lib }}36-vc{{ vc }}0-mt-{{ win_astr }}-{{ win_vstr_mm }}.lib exit 1  # [win and py==36]
         - if not exist %PREFIX%\\Library\\lib\\boost_{{ each_py_boost_lib }}37-vc{{ vc }}0-mt-{{ win_astr }}-{{ win_vstr_mm }}.lib exit 1  # [win and py==37]
+        - if not exist %PREFIX%\\Library\\lib\\boost_{{ each_py_boost_lib }}38-vc{{ vc }}0-mt-{{ win_astr }}-{{ win_vstr_mm }}.lib exit 1  # [win and py==38]
         {% endfor %}
 
 
