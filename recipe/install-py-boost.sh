@@ -5,7 +5,7 @@ set -x -e
 # remove any old builds of the python target
 ./b2 -q -d+2 --with-python --clean
 
-for PY_VER2 in 2.7 2.6 3.7; do
+for PY_VER2 in 2.7 2.6 3.7 3.8; do
     ./b2 -q -d+2 \
         --with-python \
         python=${PY_VER} \
