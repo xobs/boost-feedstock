@@ -35,7 +35,7 @@ set MAJ_MIN_PAT_VER=%MAJ%_%MIN%_%PAT%
 set MAJ_MIN_VER=%MAJ%_%MIN%
 
 :: Install fix-up for a non version-specific boost include
-move %LIBRARY_INC%\boost-%MAJ_MIN_VER%\boost %LIBRARY_INC%
+move /y %LIBRARY_INC%\boost-%MAJ_MIN_VER%\boost %LIBRARY_INC%
 if errorlevel 1 exit /b 1
 
 :: Remove Python headers as we don't build Boost.Python.
@@ -49,7 +49,7 @@ if %ARCH% == 32 (
 )
 
 :: Move DLLs to LIBRARY_BIN
-move %LIBRARY_LIB%\*vc%vc%0-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll "%LIBRARY_BIN%"
+move /y %LIBRARY_LIB%\*vc%vc%0-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll "%LIBRARY_BIN%"
 if errorlevel 1 exit /b 1
 
 copy .\b2.exe %LIBRARY_BIN%\b2.exe

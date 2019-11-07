@@ -59,8 +59,8 @@ set MAJ_MIN_VER=%MAJ%_%MIN%
 
 :: Install fix-up for a non version-specific boost include
 :: echo move %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost %LIBRARY_INC%\boost
-move %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost\python %LIBRARY_INC%\boost\
-move %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost\python.hpp %LIBRARY_INC%\boost\
+move /y %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost\python %LIBRARY_INC%\boost\
+move /y %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost\python.hpp %LIBRARY_INC%\boost\
 if errorlevel 1 exit /b 1
 
 if %ARCH% == 32 (
@@ -75,9 +75,9 @@ if not exist %INSTLOC%\lib\boost_python%CONDA_PY%-vc%vc%0-mt-%ARCH_STRING%-%MAJ_
 if not exist %INSTLOC%\lib\boost_numpy%CONDA_PY%-vc%vc%0-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll exit /b 1
 
 :: Move DLL to LIBRARY_BIN
-move %INSTLOC%\lib\*vc%vc%0-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll "%LIBRARY_BIN%"
+move /y %INSTLOC%\lib\*vc%vc%0-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll "%LIBRARY_BIN%"
 if errorlevel 1 exit /b 1
-move %INSTLOC%\lib\*vc%vc%0-mt-%ARCH_STRING%-%MAJ_MIN_VER%.lib "%LIBRARY_LIB%"
+move /y %INSTLOC%\lib\*vc%vc%0-mt-%ARCH_STRING%-%MAJ_MIN_VER%.lib "%LIBRARY_LIB%"
 if errorlevel 1 exit /b 1
 
 :: remove any old builds of the python target
