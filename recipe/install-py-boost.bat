@@ -4,7 +4,7 @@ echo on
 :: mkdir C:\Users\builder\py-boost-%PY_VER%-before-clean
 :: xcopy %CD% C:\Users\builder\py-boost-%PY_VER%-before-clean /s /e /h /q /y
 
-set INSTLOC=%CD%\py-boost-inst-%PY_VER%
+set INSTLOC=%CD%\py-boost-inst-%PY_VER%-%ARCH%
 
 :: if exist C:\Users\builder\py-boost-%PY_VER%-after-clean rd /s /q C:\Users\builder\py-boost-%PY_VER%-after-clean > NUL
 :: mkdir C:\Users\builder\py-boost-%PY_VER%-after-clean
@@ -13,12 +13,35 @@ set INSTLOC=%CD%\py-boost-inst-%PY_VER%
 :: if exist C:\Users\builder\py-boost-%PY_VER%-after-build rd /s /q C:\Users\builder\py-boost-%PY_VER%-after-build > NUL
 :: mkdir C:\Users\builder\py-boost-%PY_VER%-after-build
 
+set TOOLSET=msvc-%vc%.1
+set TOOLSET2=vc%vc%1
+if "%ARCH%"=="32" (
+  set ARCH_STRING=x32
+) else (
+  set ARCH_STRING=x64
+)
+:: I would like to switch to this, but boost_python does not
+:: work, it tries to link to boost_python.lib instead.
+:: set LAYOUT=versioned
+set LAYOUT=system
+set PY_VER_ND=%PY_VER:.=%
+
+if "%CONDA_BUILD_DEBUG_BUILD_SYSTEM%"=="yes" (
+  set DEBUG_FLAGS=-d+3 --debug
+  :: set DEBUG_ROBOCOPY=
+  set DEBUG_ROBOCOPY=/NFL /NDL
+) else (
+  set DEBUG_FLAGS=
+  set DEBUG_ROBOCOPY=/NFL /NDL
+)
+
 :: No idea, luckily it is far from slow.
 for /L %%A IN (1,1,2) DO (
   .\b2 ^
-    -q -d+2 --debug ^
+    -q %DEBUG_FLAGS% ^
     --prefix=%INSTLOC% ^
-    toolset=msvc-%vc%.0 ^
+    --layout=%LAYOUT% ^
+    toolset=%TOOLSET% ^
     address-model=%ARCH% ^
     variant=release ^
     threading=multi ^
@@ -27,22 +50,22 @@ for /L %%A IN (1,1,2) DO (
     --with-python ^
     --reconfigure ^
     python=%PY_VER% ^
-    clean
-
-  .\b2 ^
-    -q -d+2 --debug ^
-    --prefix=%INSTLOC% ^
-    toolset=msvc-%vc%.0 ^
-    address-model=%ARCH% ^
-    variant=release ^
-    threading=multi ^
-    link=static,shared ^
-    -j1 ^
-    --with-python ^
-    --reconfigure ^
-    python=%PY_VER% ^
-    install
+    clean 2>&1 | tee py-boost-%PY_VER%-clean.log
 )
+
+.\b2 ^
+  -q %DEBUG_FLAGS% ^
+  --prefix=%INSTLOC% ^
+  --layout=%LAYOUT% ^
+  toolset=%TOOLSET% ^
+  address-model=%ARCH% ^
+  variant=release ^
+  threading=multi ^
+  link=static,shared ^
+  --with-python ^
+  --reconfigure ^
+  python=%PY_VER% ^
+  install 2>&1 | tee py-boost-%PY_VER%-install.log
 
 :: xcopy %CD% C:\Users\builder\py-boost-%PY_VER%-after-build /s /e /h /q /y
 
@@ -57,40 +80,55 @@ for /F "tokens=1,2,3 delims=." %%a in ("%PKG_VERSION%") do (
 set MAJ_MIN_PAT_VER=%MAJ%_%MIN%_%PAT%
 set MAJ_MIN_VER=%MAJ%_%MIN%
 
-:: Install fix-up for a non version-specific boost include
-:: echo move %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost %LIBRARY_INC%\boost
-move /y %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost\python %LIBRARY_INC%\boost\
-move /y %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost\python.hpp %LIBRARY_INC%\boost\
+:: Not sure about this, shouldn't these go in share\cmake instead? If so then install-libboost.bat needs
+:: fixing too.
+mkdir %LIBRARY_LIB%\cmake
+mkdir %LIBRARY_INC%\boost\python
+move /y %INSTLOC%\lib\cmake "%LIBRARY_LIB%\cmake"
 if errorlevel 1 exit /b 1
 
-if %ARCH% == 32 (
-  set ARCH_STRING=x32
+if "%LAYOUT%"=="versioned" (
+  :: Install fix-up for a non version-specific boost include
+  :: move /y %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost\python %LIBRARY_INC%\boost\
+  robocopy /E %DEBUG_ROBOCOPY% %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost\python %LIBRARY_INC%\boost\python\
+  copy /y %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost\python.hpp %LIBRARY_INC%\boost\python\
+
+  :: Spent too long on this. Hopefully the clean command is now correct. If not you'll find objs that
+  :: contain e.g. DEFAULT:python37.lib when linking to Python 3.6 and those need to be removed.
+  if not exist %INSTLOC%\lib\boost_python%PY_VER_ND%-%TOOLSET2%-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll (
+    echo ERROR :: Did not find %INSTLOC%\lib\boost_python%PY_VER_ND%-%TOOLSET2%-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll
+    exit /b 1
+  )
+  if not exist %INSTLOC%\lib\boost_numpy%PY_VER_ND%-%TOOLSET2%-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll (
+    echo ERROR :: Did not find %INSTLOC%\lib\boost_numpy%PY_VER_ND%-%TOOLSET2%-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll
+    exit /b 1
+  )
+  :: Move DLLs to LIBRARY_BIN
+  move /y %INSTLOC%\lib\*%TOOLSET2%-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll "%LIBRARY_BIN%"
+  if errorlevel 1 exit /b 1
+  move /y %INSTLOC%\lib\*%TOOLSET2%-mt-%ARCH_STRING%-%MAJ_MIN_VER%.lib "%LIBRARY_LIB%"
+  if errorlevel 1 exit /b 1
 ) else (
-  set ARCH_STRING=x64
+  robocopy /E %DEBUG_ROBOCOPY% %INSTLOC%\include\boost\python %LIBRARY_INC%\boost\python\
+  copy /y %INSTLOC%\include\boost\python.hpp %LIBRARY_INC%\boost\python\
+  move /y %INSTLOC%\lib\boost*.lib "%LIBRARY_LIB%"
+  copy /y "%LIBRARY_LIB%\boost_python%PY_VER_ND%.lib" "%LIBRARY_LIB%\boost_python.lib"
+  copy /y "%LIBRARY_LIB%\boost_numpy%PY_VER_ND%.lib" "%LIBRARY_LIB%\boost_numpy.lib"
+  if errorlevel 1 exit /b 1
+  move /y %INSTLOC%\lib\boost*.dll "%LIBRARY_BIN%"
+  if errorlevel 1 exit /b 1
 )
-
-:: Spent too long on this. Hopefully the clean command is now correct. If not you'll find objs that
-:: contain e.g. DEFAULT:python37.lib when linking to Python 3.6 and those need to be removed.
-if not exist %INSTLOC%\lib\boost_python%CONDA_PY%-vc%vc%0-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll exit /b 1
-if not exist %INSTLOC%\lib\boost_numpy%CONDA_PY%-vc%vc%0-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll exit /b 1
-
-:: Move DLL to LIBRARY_BIN
-move /y %INSTLOC%\lib\*vc%vc%0-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll "%LIBRARY_BIN%"
-if errorlevel 1 exit /b 1
-move /y %INSTLOC%\lib\*vc%vc%0-mt-%ARCH_STRING%-%MAJ_MIN_VER%.lib "%LIBRARY_LIB%"
-if errorlevel 1 exit /b 1
 
 :: remove any old builds of the python target
 .\b2 ^
-  -q -d+2 --debug ^
+  -q %DEBUG_FLAGS% ^
   --prefix=%INSTLOC% ^
-  toolset=msvc-%vc%.0 ^
+  --layout=%LAYOUT% ^
   address-model=%ARCH% ^
   variant=release ^
   threading=multi ^
   link=static,shared ^
-  -j1 ^
   --with-python ^
   --reconfigure ^
   python=%PY_VER% ^
-  clean python
+  clean python 2>&1 | tee py-boost-%PY_VER%-clean-final.log

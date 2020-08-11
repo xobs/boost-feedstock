@@ -1,4 +1,4 @@
---- a/work/tools/build/src/tools/python.jam.orig	2019-09-28 01:53:15.000000000 +0200
+--- a/work/tools/build/src/tools/python.jam	2019-09-28 01:53:15.000000000 +0200
 +++ b/work/tools/build/src/tools/python.jam	2019-09-28 02:05:35.398305513 +0200
 @@ -498,6 +498,10 @@
                  sys.$(s) = [ SUBST $(output) "\\<$(s)=([^$(nl)]+)" $1 ] ;
