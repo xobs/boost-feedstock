@@ -10,8 +10,13 @@ if [[ ${CONDA_BUILD_DEBUG_BUILD_SYSTEM} == yes ]]; then
   _GENERIC_OPTS+=(-q -d+2)
 fi
 _GENERIC_OPTS+=(variant=release)
-_GENERIC_OPTS+=(address-model="${ARCH}")
-_GENERIC_OPTS+=(architecture=x86)
+if [[ ${ARCH} == ppc64le ]]; then
+  _GENERIC_OPTS+=(address-model="64")
+  _GENERIC_OPTS+=(architecture=power)
+else
+  _GENERIC_OPTS+=(address-model="${ARCH}")
+  _GENERIC_OPTS+=(architecture=x86)
+fi
 _GENERIC_OPTS+=(debug-symbols=off)
 # TODO :: Put the single threaded libraries into a separate library if we want this:
 #         Some research (as of 1.71.0):

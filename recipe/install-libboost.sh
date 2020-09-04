@@ -1,6 +1,3 @@
-eval "$('/home/app-admin/conda/bin/python' -m conda shell.bash hook)"
-conda activate "/home/app-admin/conda/conda-bld/bst-1.73.0_5/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_pla"
-conda activate --stack "/home/app-admin/conda/conda-bld/bst-1.73.0_5/_build_env"
 #!/bin/bash
 
 set -x -e
