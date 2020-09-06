@@ -5,6 +5,10 @@ INCLUDE_PATH="${PREFIX}/include"
 LIBRARY_PATH="${PREFIX}/lib"
 
 LINKFLAGS="${LINKFLAGS} -L${LIBRARY_PATH}"
+if [[ ${target_platform} =~ osx.* ]]; then
+  export CXXFLAGS="${CXXFLAGS} -std=c++14 -stdlib=libc++"
+  export LINKFLAGS="${LINKFLAGS} -std=c++14"
+fi
 declare -a _GENERIC_OPTS=()
 if [[ ${CONDA_BUILD_DEBUG_BUILD_SYSTEM} == yes ]]; then
   _GENERIC_OPTS+=(-q -d+2)
@@ -45,8 +49,8 @@ _GENERIC_OPTS+=(-j${CPU_COUNT})
 declare -a _TP_OPTS=()
 if [[ ${target_platform} == osx-64 ]]; then
   _TP_OPTS+=(target-os=darwin)
-  _TP_OPTS+=(binary-format=mach-o)
-  _TP_OPTS+=(abi=sysv)
+  # _TP_OPTS+=(binary-format=mach-o)
+  # _TP_OPTS+=(abi=sysv)
   _TP_OPTS+=(threading=multi)
 fi
 
@@ -54,9 +58,9 @@ if [[ ${target_platform} == osx-64 ]]; then
   # See this comment in tools/build/src/tools/darwin.jam
   # "# - The archive builder (libtool is the default as creating
   #  #   archives in darwin is complicated."
-  ARCHIVER=${LIBTOOL}
-  # Maybe clang?
-  TOOLSET_REAL=darwin
+  ARCHIVER=${AR}
+  # Maybe clang? Or clang-darwin100?
+  TOOLSET_REAL=clang-darwin100
   TOOLSET_VERSION=10.0.0
 else
   TOOLSET_REAL=gcc

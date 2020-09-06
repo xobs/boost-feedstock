@@ -13,13 +13,24 @@ set -o pipefail
 
 . ${RECIPE_DIR}/set__ALL_OPTS.sh
 
-echo LIZZY1 "${_ALL_OPTS[@]}"
+if [[ ${target_platform} =~ osx.* ]]; then
+  cp ${RECIPE_DIR}/xcode-select .
+  chmod +x xcode-select
+  PATH=${PWD}:${PATH}
+fi
+
+if [[ ${target_platform} =~ osx.* ]]; then
+  TOOLSET_REAL=clang
+else
+  TOOLSET_REAL=cxx
+fi
+TOOLSET=cxx
 
 # cross-cxx toolset is available for cross-compiling, but does not appear to work
 export BUILD_CXX=${CXX}
 export BUILD_CXXFLAGS=${CXXFLAGS}
 export BUILD_LDFLAGS=${LDFLAGS}
-TOOLSET=cxx
+
 
 # http://www.boost.org/build/doc/html/bbv2/tasks/crosscompile.html
 cat <<EOF > ${SRC_DIR}/tools/build/src/site-config.jam
@@ -33,7 +44,7 @@ EOF
     --without-libraries=python  \
     2>&1 | tee bootstrap.log
 
-# Boost's build system is not fun to work with.
+# Boosts build system is not fun to work with.
 if [[ ${TOOLSET} == cxx ]]; then
   TOOLSET_NEW=${TOOLSET_REAL}
   sed -i.bak "s,cxx,${TOOLSET_NEW},g" project-config.jam
@@ -75,10 +86,10 @@ echo "Information :: Calling b2 with a fake target to catch early failures"
      target_does_not_exist 2>&1 > b2.prebuild-fake-fail.log 2>&1 || true
 
 for _MSG in error: warning:; do
-  if grep -q "^${_MSG}" b2.configure.log; then
+  if grep -q "^${_MSG}" b2.prebuild-fake-fail.log; then
     echo -e "\n\n***** $(echo ${_MSG::${#_MSG} - 1} | tr 'a-z' 'A-Z') *****"
     echo -e "\nThe following ${_MSG::${#_MSG} - 1} were found during the configuration stage of b2:\n"
-    grep "^${_MSG}" b2.configure.log -A2 || true
+    grep "^${_MSG}" b2.prebuild-fake-fail.log -A2 || true
     echo -e "\n\n***** $(echo ${_MSG::${#_MSG} - 1} | tr 'a-z' 'A-Z') *****\n"
     if [[ "${_MSG}" == "error:" ]]; then
       echo -e ".. stopping build.\n"

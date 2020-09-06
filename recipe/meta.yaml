@@ -4,7 +4,7 @@
 {% set win_astr = "x32" if win32 else "x64" %}
 {% set filename = "boost_%s.tar.bz2" % win_vstr %}
 
-# {% set debug_build_system = os.environ.get('CONDA_BUILD_DEBUG_BUILD_SYSTEM', 'no') %}
+{% set debug_build_system = os.environ.get('CONDA_BUILD_DEBUG_BUILD_SYSTEM', 'no') %}
 
 package:
   # Short name to avoid filename length issues on Windows.
@@ -24,7 +24,7 @@ source:
     - 0005-boost.python-add-Library-include-and-lib-on-Win.patch
 
 build:
-  number: 8
+  number: 9
 
 requirements:
   build:
@@ -47,8 +47,8 @@ outputs:
   - name: libboost
     build:
       activate_in_script: True
-      # script_env:
-      #   - CONDA_BUILD_DEBUG_BUILD_SYSTEM={{ debug_build_system }}
+      script_env:
+        - CONDA_BUILD_DEBUG_BUILD_SYSTEM={{ debug_build_system }}
     script: install-libboost.sh   # [unix]
     script: install-libboost.bat  # [win]
     requirements:
@@ -134,8 +134,8 @@ outputs:
     script: install-py-boost.bat  # [win]
     build:
       activate_in_script: True
-      # script_env:
-      #   - CONDA_BUILD_DEBUG_BUILD_SYSTEM={{ debug_build_system }}
+      script_env:
+        - CONDA_BUILD_DEBUG_BUILD_SYSTEM={{ debug_build_system }}
     requirements:
       build:
         - {{ compiler('c') }}
