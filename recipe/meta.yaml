@@ -23,9 +23,11 @@ source:
     - 0001-CONDA_BUILD-customization.patch
     - 0002-boost.python-fix-python-lib-config-abiflags.patch
     - 0003-boost.python-fix-unix-library-paths-and-darwin-sysroot.patch
+{% if from_source_control != 'yes' %}
     # From: https://trac.macports.org/ticket/60287
     # .. it was hoped this patch would make it into 1.73 but it did not.
     - 0004-patch-clang_version.patch
+{% endif %}
     - 0005-boost.python-add-Library-include-and-lib-on-Win.patch
 
 build:
