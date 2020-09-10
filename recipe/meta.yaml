@@ -2,7 +2,7 @@
 {% set win_vstr = version.replace('.', '_') %}
 {% set win_vstr_mm = "_".join(version.split(".")[:2]) %}
 {% set win_astr = "x32" if win32 else "x64" %}
-{% set filename = "boost_%s.tar.bz2" % win_vstr %}
+{% set from_source_control = 'no' %}
 
 {% set debug_build_system = os.environ.get('CONDA_BUILD_DEBUG_BUILD_SYSTEM', 'no') %}
 
@@ -12,8 +12,13 @@ package:
   version: {{ version }}
 
 source:
+{% if from_source_control == 'yes' %}
+  git_url: https://github.com/boostorg/boost.git
+  git_ref: boost-{{ version }}
+{% else %}
   url: https://dl.bintray.com/boostorg/release/{{ version }}/source/boost_{{ version.replace(".", "_") }}.tar.bz2
   sha256: 4eb3b8d442b426dc35346235c8733b5ae35ba431690e38c6a8263dce9fcbb402
+{% endif %}
   patches:
     - 0001-CONDA_BUILD-customization.patch
     - 0002-boost.python-fix-python-lib-config-abiflags.patch
@@ -24,13 +29,16 @@ source:
     - 0005-boost.python-add-Library-include-and-lib-on-Win.patch
 
 build:
-  number: 9
+  number: 10
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - {{ ccache('symlinks') }}
+{% if from_source_control == 'yes' %}
+    - git
+{% endif %}
     - patch  # [not win]
     - m2-patch  # [win]
     - m2-coreutils  # [win]
