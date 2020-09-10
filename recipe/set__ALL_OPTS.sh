@@ -61,6 +61,8 @@ if [[ ${target_platform} == osx-64 ]]; then
   ARCHIVER=${AR}
   # Maybe clang? Or clang-darwin100?
   TOOLSET_REAL=clang-darwin100
+  # Maybe clang?
+  # TOOLSET_REAL=darwin
   TOOLSET_VERSION=10.0.0
 else
   TOOLSET_REAL=gcc

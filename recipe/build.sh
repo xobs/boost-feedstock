@@ -26,6 +26,13 @@ else
 fi
 TOOLSET=cxx
 
+if [[ ${target_platform} =~ osx.* ]]; then
+  TOOLSET_REAL=clang
+else
+  TOOLSET_REAL=cxx
+fi
+TOOLSET=cxx
+
 # cross-cxx toolset is available for cross-compiling, but does not appear to work
 export BUILD_CXX=${CXX}
 export BUILD_CXXFLAGS=${CXXFLAGS}
@@ -37,12 +44,15 @@ cat <<EOF > ${SRC_DIR}/tools/build/src/site-config.jam
 using ${TOOLSET} : : ${CXX} ;
 EOF
 
-./bootstrap.sh \
+# rm -f ${LIBTOOL} || exit 1
+# export LIBTOOL=${BUILD_PREFIX}/bin/libtool
+# export ARCHIVER=${BUILD_PREFIX}/bin/libtool
+
+bash -x $PWD/bootstrap.sh \
     --prefix="${PREFIX}"  \
     --with-icu="${PREFIX}"  \
     --with-toolset=${TOOLSET}  \
-    --without-libraries=python  \
-    2>&1 | tee bootstrap.log
+    --without-libraries=python
 
 # Boosts build system is not fun to work with.
 if [[ ${TOOLSET} == cxx ]]; then

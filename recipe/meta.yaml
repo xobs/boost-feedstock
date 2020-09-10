@@ -32,6 +32,8 @@ source:
 
 build:
   number: 10
+  # script_env:
+  #   - CONDA_BUILD_DEBUG_BUILD_SYSTEM={{ debug_build_system }}
 
 requirements:
   build:
@@ -45,6 +47,7 @@ requirements:
     - m2-patch  # [win]
     - m2-coreutils  # [win]
     - m2-gcc-libs  # [win]
+    # - libtool  # [osx]
   host:
     - icu               # [unix]
     - bzip2             # [unix]
