@@ -26,13 +26,6 @@ else
 fi
 TOOLSET=cxx
 
-if [[ ${target_platform} =~ osx.* ]]; then
-  TOOLSET_REAL=clang
-else
-  TOOLSET_REAL=cxx
-fi
-TOOLSET=cxx
-
 # cross-cxx toolset is available for cross-compiling, but does not appear to work
 export BUILD_CXX=${CXX}
 export BUILD_CXXFLAGS=${CXXFLAGS}

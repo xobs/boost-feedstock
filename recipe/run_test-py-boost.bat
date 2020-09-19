@@ -7,7 +7,7 @@ pushd libs\python\example\tutorial
   :: bjam -q -d+2 --debug --debug-configuration || VER>NUL
   :: python -c 'from __future__ import print_function; import hello_ext; print(hello_ext.greet())' || VER>NUL
   :: Fail on failures:
-  bjam --debug-configuration toolset=msvc-14.1 --layout=system
+  bjam --debug-configuration toolset=msvc-14.1 --layout=versioned
   if errorlevel 1 exit /b 1
   python -c 'from __future__ import print_function; import hello_ext; print(hello_ext.greet())'
   if errorlevel 1 exit /b 1

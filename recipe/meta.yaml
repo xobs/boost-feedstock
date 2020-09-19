@@ -74,10 +74,6 @@ outputs:
       host:
         - icu               # [unix]
         - bzip2             # [unix]
-        - libiconv          # [osx]
-        - xz >=5.2.5
-        - zstd >=1.4.5
-        - zlib >=1.2.11
     test:
       commands:
         # Verify b2 and bjam executables work
@@ -159,16 +155,15 @@ outputs:
       host:
         - {{ pin_subpackage('libboost', exact=True) }}
         - python
-        - numpy
       run:
         - {{ pin_subpackage('libboost', exact=True) }}
         - python
-        - {{ pin_compatible('numpy') }}
     test:
       source_files: libs/python/example/*
       requires:
         - {{ compiler('c') }}    # [not win]
         - {{ compiler('cxx') }}  # [not win]
+        - numpy
       script: run_test-py-boost.sh  # [not win]
       script: run_test-py-boost.bat  # [win]
       commands:
