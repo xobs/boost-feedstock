@@ -45,9 +45,8 @@ popd
 # cp ${SRC_DIR}/tools/build/src/site-config.jam "${PREFIX}/etc"
 
 pushd tools/build
-  echo LIZZY2 "${_ALL_OPTS[@]}"
   ./bootstrap.sh \
-    --with-toolset=${TOOLSET_REAL}
+    --with-toolset=${TOOLSET}
   # We need to delete this otherwise install will fail to overwrite due to it being open
   # (though why would it be open?!)
   rm -rf ${PREFIX}/bin/b2
@@ -55,7 +54,8 @@ pushd tools/build
   ${PREFIX}/bin/bjam \
     "${_ALL_OPTS[@]}" \
     install 2>&1 | tee b2.build-final-bjam.log
-  echo "LIZZY3 Done bjam install"
   cp ${PREFIX}/bin/b2 ${PREFIX}/bin/bjam
-  echo "LIZZY4 Done cp"
 popd
+
+mkdir -p $PREFIX/share/boost-build/src/kernel/ || true
+cp tools/build/src/site-config.jam ${PREFIX}/share/boost-build/src/kernel/

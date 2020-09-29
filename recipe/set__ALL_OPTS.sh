@@ -60,15 +60,13 @@ if [[ ${target_platform} == osx-64 ]]; then
   #  #   archives in darwin is complicated."
   ARCHIVER=${AR}
   # Maybe clang? Or clang-darwin100?
-  TOOLSET_REAL=clang-darwin100
-  # Maybe clang?
-  # TOOLSET_REAL=darwin
+  TOOLSET=clang
   TOOLSET_VERSION=10.0.0
 else
-  TOOLSET_REAL=gcc
+  TOOLSET=gcc
   TOOLSET_VERSION=7.3.0
   ARCHIVER=${AR}
 fi
-_TP_OPTS+=(toolset=${TOOLSET_REAL})
+_TP_OPTS+=(toolset=${TOOLSET})
 
 declare -a _ALL_OPTS=("${_GENERIC_OPTS[@]}" "${_TP_OPTS[@]}")

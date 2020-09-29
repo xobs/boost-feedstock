@@ -39,7 +39,7 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - {{ ccache('symlinks') }}
+    # - {{ ccache('symlinks') }}
 {% if from_source_control == 'yes' %}
     - git
 {% endif %}
@@ -49,9 +49,9 @@ requirements:
     - m2-gcc-libs  # [win]
     # - libtool  # [osx]
   host:
-    - icu               # [unix]
-    - bzip2             # [unix]
-    - libiconv          # [osx]
+    - icu  # [unix]
+    - libiconv  # [osx]
+    - bzip2  # [unix]
     - xz >=5.2.5
     - zstd >=1.4.5
     - zlib >=1.2.11
@@ -72,13 +72,28 @@ outputs:
         - m2-coreutils  # [win]
         - m2-gcc-libs  # [win]
       host:
-        - icu               # [unix]
-        - bzip2             # [unix]
+        - icu  # [unix]
+        - libiconv  # [osx]
+        - bzip2  # [unix]
+        - xz >=5.2.5
+        - zstd >=1.4.5
+        - zlib >=1.2.11
     test:
+      requires:
+        - ripgrep
+        - {{ compiler('cxx') }}
+      files:
+        - tests
       commands:
         # Verify b2 and bjam executables work
         - b2 --help
         - bjam --help
+        - pushd tests
+        -   pushd hello_world_cxx
+        -     ./test.sh  # [not win]
+        -     test.bat  # [win]
+        -   popd
+        - popd
         # Verify Python headers are removed.
         - "! test -f $PREFIX/include/boost/python.hpp"                      # [unix]
         - "! test -d $PREFIX/include/boost/python"                          # [unix]
@@ -155,21 +170,23 @@ outputs:
       host:
         - {{ pin_subpackage('libboost', exact=True) }}
         - python
+        - numpy
       run:
         - {{ pin_subpackage('libboost', exact=True) }}
         - python
     test:
       source_files: libs/python/example/*
       requires:
-        - {{ compiler('c') }}    # [not win]
-        - {{ compiler('cxx') }}  # [not win]
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
         - numpy
-      script: run_test-py-boost.sh  # [not win]
-      script: run_test-py-boost.bat  # [win]
+      script: tests/hello_world_py/test.sh  # [not win]
+      script: tests/hello_world_py/test.bat  # [win]
       commands:
         # verify Python headers
         - test -f $PREFIX/include/boost/python.hpp                # [unix]
         - test -d $PREFIX/include/boost/python                    # [unix]
+        - test -f $PREFIX/share/boost-build/src/kernel/site-config.jam  # [unix]
         - if not exist %LIBRARY_INC%\\boost\\python.hpp exit 1    # [win]
         - if not exist %LIBRARY_INC%\\boost\\python exit 1        # [win]
 

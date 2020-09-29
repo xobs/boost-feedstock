@@ -50,7 +50,7 @@ for /L %%A IN (1,1,2) DO (
     --with-python ^
     --reconfigure ^
     python=%PY_VER% ^
-    clean 2>&1 | tee py-boost-%PY_VER%-clean.log
+    clean > py-boost-%PY_VER%-clean.log 2>&1
 )
 
 .\b2 ^
@@ -65,7 +65,11 @@ for /L %%A IN (1,1,2) DO (
   --with-python ^
   --reconfigure ^
   python=%PY_VER% ^
-  install 2>&1 | tee py-boost-%PY_VER%-install.log
+  install > py-boost-%PY_VER%-install.log 2>&1
+if errorlevel 1 (
+  cat py-boost-%PY_VER%-install.log
+  exit /b 1
+)
 
 :: xcopy %CD% C:\Users\builder\py-boost-%PY_VER%-after-build /s /e /h /q /y
 
@@ -87,6 +91,11 @@ mkdir %LIBRARY_INC%\boost\python
 move /y %INSTLOC%\lib\cmake "%LIBRARY_LIB%\cmake"
 if errorlevel 1 exit /b 1
 
+:: set DBGINFIX=-gd
+set DBGINFIX=
+
+set VERSIONED_FNAME_INFIX=%PY_VER_ND%-%TOOLSET2%-mt%DBGINFIX%-%ARCH_STRING%-%MAJ_MIN_VER%
+
 if "%LAYOUT%"=="versioned" (
   :: Install fix-up for a non version-specific boost include
   :: move /y %INSTLOC%\include\boost-%MAJ_MIN_VER%\boost\python %LIBRARY_INC%\boost\
@@ -99,8 +108,8 @@ if "%LAYOUT%"=="versioned" (
     echo ERROR :: Did not find %INSTLOC%\lib\boost_python%PY_VER_ND%-%TOOLSET2%-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll
     exit /b 1
   )
-  if not exist %INSTLOC%\lib\boost_numpy%PY_VER_ND%-%TOOLSET2%-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll (
-    echo ERROR :: Did not find %INSTLOC%\lib\boost_numpy%PY_VER_ND%-%TOOLSET2%-mt-%ARCH_STRING%-%MAJ_MIN_VER%.dll
+  if not exist %INSTLOC%\lib\boost_numpy%VERSIONED_FNAME_INFIX%.dll (
+    echo ERROR :: Did not find %INSTLOC%\lib\boost_numpy%VERSIONED_FNAME_INFIX%.dll
     exit /b 1
   )
   :: Move DLLs to LIBRARY_BIN
@@ -114,10 +123,18 @@ if "%LAYOUT%"=="versioned" (
   move /y %INSTLOC%\lib\boost*.lib "%LIBRARY_LIB%"
   copy /y "%LIBRARY_LIB%\boost_python%PY_VER_ND%.lib" "%LIBRARY_LIB%\boost_python.lib"
   copy /y "%LIBRARY_LIB%\boost_numpy%PY_VER_ND%.lib" "%LIBRARY_LIB%\boost_numpy.lib"
+
+  :: python-boost just does not seem to care and always tries to link to versioned libs. Debugging this is
+  :: painful.
+  copy /y "%LIBRARY_LIB%\boost_python%PY_VER_ND%.lib" "%LIBRARY_LIB%\boost_python%VERSIONED_FNAME_INFIX%.lib"
+  if errorlevel 1 exit /b 1
+  copy /y "%LIBRARY_LIB%\boost_numpy%PY_VER_ND%.lib" "%LIBRARY_LIB%\boost_numpy%VERSIONED_FNAME_INFIX%.lib"
+  if errorlevel 1 exit /b 1
+
   if errorlevel 1 exit /b 1
   move /y %INSTLOC%\lib\boost*.dll "%LIBRARY_BIN%"
   if errorlevel 1 exit /b 1
-)
+) 
 
 :: remove any old builds of the python target
 .\b2 ^
@@ -131,4 +148,4 @@ if "%LAYOUT%"=="versioned" (
   --with-python ^
   --reconfigure ^
   python=%PY_VER% ^
-  clean python 2>&1 | tee py-boost-%PY_VER%-clean-final.log
+  clean python > py-boost-%PY_VER%-clean-final.log 2>&1

@@ -47,7 +47,11 @@ if "%CONDA_BUILD_DEBUG_BUILD_SYSTEM%"=="yes" (
   -j%CPU_COUNT%              ^
   %WITHOUTS%                 ^
   install                    ^
-  2>&1 | tee b2.install.log
+  > b2.install.log 2>&1
+if errorlevel 1 (
+  cat b2.install.log
+  exit /b 1
+)
 
 :: Move DLLs to LIBRARY_BIN
 move %LIBRARY_LIB%\boost*.dll "%LIBRARY_BIN%"

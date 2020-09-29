@@ -13,18 +13,13 @@ set -o pipefail
 
 . ${RECIPE_DIR}/set__ALL_OPTS.sh
 
+echo "Compiling boost with TOOLSET: $TOOLSET"
+
 if [[ ${target_platform} =~ osx.* ]]; then
   cp ${RECIPE_DIR}/xcode-select .
   chmod +x xcode-select
   PATH=${PWD}:${PATH}
 fi
-
-if [[ ${target_platform} =~ osx.* ]]; then
-  TOOLSET_REAL=clang
-else
-  TOOLSET_REAL=cxx
-fi
-TOOLSET=cxx
 
 # cross-cxx toolset is available for cross-compiling, but does not appear to work
 export BUILD_CXX=${CXX}
@@ -37,23 +32,11 @@ cat <<EOF > ${SRC_DIR}/tools/build/src/site-config.jam
 using ${TOOLSET} : : ${CXX} ;
 EOF
 
-# rm -f ${LIBTOOL} || exit 1
-# export LIBTOOL=${BUILD_PREFIX}/bin/libtool
-# export ARCHIVER=${BUILD_PREFIX}/bin/libtool
-
 bash -x $PWD/bootstrap.sh \
     --prefix="${PREFIX}"  \
     --with-icu="${PREFIX}"  \
     --with-toolset=${TOOLSET}  \
     --without-libraries=python
-
-# Boosts build system is not fun to work with.
-if [[ ${TOOLSET} == cxx ]]; then
-  TOOLSET_NEW=${TOOLSET_REAL}
-  sed -i.bak "s,cxx,${TOOLSET_NEW},g" project-config.jam
-  sed -i.bak "s,cxx,${TOOLSET_NEW},g" tools/build/src/site-config.jam
-  TOOLSET=${TOOLSET_NEW}
-fi
 
 # Archlinux emits this into project-config.jam (well, for python2.7 initially
 # alongside the build of all the rest, then this is sedded into this file and
@@ -63,16 +46,15 @@ fi
 #    using python : 3.7 : "/usr" : /usr/include/python3.7m ;
 # }
 
-
+# The quotes around things with spaces are essential here:
 for _SCJ in site-config.jam tools/build/src/site-config.jam; do
   cat << EOF > ${_SCJ}
   using ${TOOLSET} : ${TOOLSET_VERSION} : $(basename ${CXX})
               : # options
                   <archiver>$(basename ${ARCHIVER})
-                  <asmflags>${CFLAGS}
-                  <cflags>${CFLAGS}
-                  <cxxflags>${CXXFLAGS}
-                  <linkflags>${LDFLAGS}
+                  <cflags>"${CFLAGS}"
+                  <cxxflags>"${CXXFLAGS}"
+                  <linkflags>"${LDFLAGS}"
                   <ranlib>$(basename ${RANLIB})
               ;
 EOF
