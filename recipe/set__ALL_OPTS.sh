@@ -17,6 +17,12 @@ _GENERIC_OPTS+=(variant=release)
 if [[ ${ARCH} == ppc64le ]]; then
   _GENERIC_OPTS+=(address-model="64")
   _GENERIC_OPTS+=(architecture=power)
+elif [[ ${ARCH} == aarch64 ]]; then
+  _GENERIC_OPTS+=(address-model="64")
+  _GENERIC_OPTS+=(architecture=arm)
+elif [[ ${ARCH} == s390x ]]; then
+  _GENERIC_OPTS+=(address-model="64")
+  _GENERIC_OPTS+=(architecture=s390x)
 else
   _GENERIC_OPTS+=(address-model="${ARCH}")
   _GENERIC_OPTS+=(architecture=x86)
