@@ -1,0 +1,11 @@
+--- a/work/tools/build/src/tools/python.jam	2019-09-28 13:13:54.000000000 +0200
++++ b/work/tools/build/src/tools/python.jam	2019-09-28 13:14:43.000000000 +0200
+@@ -116,7 +116,7 @@
+ #elif PY_VERSION_HEX >= 0x03000000
+   // Let python open the file to avoid potential binary incompatibilities.
+   PyObject *fo = Py_BuildValue("s", f);
+-  FILE *fs = _Py_fopen(fo, "r"); // Private CPython API
++  FILE *fs = fopen(fo, "r");
+   Py_DECREF(fo);
+ #else
+  // Let python open the file to avoid potential binary incompatibilities.
