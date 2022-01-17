@@ -1,11 +1,17 @@
---- a/work/tools/build/src/tools/python.jam	2019-09-28 13:13:54.000000000 +0200
-+++ b/work/tools/build/src/tools/python.jam	2019-09-28 13:14:43.000000000 +0200
-@@ -116,7 +116,7 @@
- #elif PY_VERSION_HEX >= 0x03000000
+Index: boost_1_71_0/libs/python/src/exec.cpp
+===================================================================
+--- boost_1_71_0.orig/libs/python/src/exec.cpp
++++ boost_1_71_0/libs/python/src/exec.cpp
+@@ -106,10 +106,10 @@ object BOOST_PYTHON_DECL exec_file(char 
+   char *f = const_cast<char *>(filename);
    // Let python open the file to avoid potential binary incompatibilities.
+ #if PY_VERSION_HEX >= 0x03040000
+-  FILE *fs = _Py_fopen(f, "r");
++  FILE *fs = fopen(f, "r");
+ #elif PY_VERSION_HEX >= 0x03000000
    PyObject *fo = Py_BuildValue("s", f);
--  FILE *fs = _Py_fopen(fo, "r"); // Private CPython API
+-  FILE *fs = _Py_fopen(fo, "r");
 +  FILE *fs = fopen(fo, "r");
    Py_DECREF(fo);
  #else
-  // Let python open the file to avoid potential binary incompatibilities.
+   PyObject *pyfile = PyFile_FromString(f, const_cast<char*>("r"));
