@@ -18,7 +18,7 @@ source:
     - 0003-boost.python-fix-unix-library-paths-and-darwin-sysroot.patch
     - 0004-patch-clang_version.patch
     - 0005-boost.python-add-Library-include-and-lib-on-Win.patch
-    - 0006-boost.python-3.10.patch
+    - 0006-boost.python-3.10.patch  # [py>39]
 
 build:
   number: 0
