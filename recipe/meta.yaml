@@ -27,6 +27,10 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - patch     # [unix]
+    - git       # [unix]
+    - m2-patch  # [win]
+    - m2-git    # [win]
   host:
     - icu               # [unix]
     - bzip2             # [unix]
