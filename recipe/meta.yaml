@@ -31,7 +31,7 @@ source:
     - 0005-boost.python-add-Library-include-and-lib-on-Win.patch
 
 build:
-  number: 11
+  number: 12
   # script_env:
   #   - CONDA_BUILD_DEBUG_BUILD_SYSTEM={{ debug_build_system }}
 
