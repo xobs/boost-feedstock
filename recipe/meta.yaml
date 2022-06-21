@@ -34,6 +34,8 @@ build:
   number: 12
   # script_env:
   #   - CONDA_BUILD_DEBUG_BUILD_SYSTEM={{ debug_build_system }}
+  missing_dso_whitelist:
+    - '$RPATH/ld64.so.1'  # [s390x]
 
 requirements:
   build:
