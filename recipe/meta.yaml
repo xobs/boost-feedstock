@@ -29,6 +29,9 @@ source:
     - 0004-patch-clang_version.patch
 {% endif %}
     - 0005-boost.python-add-Library-include-and-lib-on-Win.patch
+    # Fixes compilation with Python 3.10, see also 
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1912903
+    - 0006-boost.python-py-fopen-private.patch
 
 build:
   number: 12
