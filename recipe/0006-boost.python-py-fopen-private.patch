@@ -6,7 +6,7 @@ diff -urN a/libs/python/src/exec.cpp b/libs/python/src/exec.cpp
    char *f = const_cast<char *>(filename);
    // Let python open the file to avoid potential binary incompatibilities.
 -#if PY_VERSION_HEX >= 0x03040000
-+#if PY_VERSION_HEX >= 0x03100000
++#if PY_VERSION_HEX >= 0x030A0000
 +  FILE *fs = fopen(f, "r");
 +#elif PY_VERSION_HEX >= 0x03040000
    FILE *fs = _Py_fopen(f, "r");
