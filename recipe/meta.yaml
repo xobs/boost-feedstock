@@ -243,10 +243,13 @@ outputs:
         - python
 
 about:
-  home: http://www.boost.org/
-  license: Boost-1.0
+  home: https://www.boost.org/
+  license: BSL-1.0
+  license_family: OTHER
   license_file: LICENSE_1_0.txt
   summary: Free peer-reviewed portable C++ source libraries.
+  dev_url: https://www.boost.org/doc/libs/{{ win_vstr }}/more/getting_started/index.html
+  doc_url: https://www.boost.org/doc/libs/{{ win_vstr }}/
 
 extra:
   recipe-maintainers:
