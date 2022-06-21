@@ -37,8 +37,6 @@ build:
   number: 12
   # script_env:
   #   - CONDA_BUILD_DEBUG_BUILD_SYSTEM={{ debug_build_system }}
-  missing_dso_whitelist:
-    - '$RPATH/ld64.so.1'  # [s390x]
 
 requirements:
   build:
@@ -67,6 +65,8 @@ outputs:
       activate_in_script: True
       script_env:
         - CONDA_BUILD_DEBUG_BUILD_SYSTEM={{ debug_build_system }}
+      missing_dso_whitelist:
+        - '$RPATH/ld64.so.1'  # [s390x]
     script: install-libboost.sh   # [unix]
     script: install-libboost.bat  # [win]
     requirements:
