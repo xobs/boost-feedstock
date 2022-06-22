@@ -29,9 +29,12 @@ source:
     - 0004-patch-clang_version.patch
 {% endif %}
     - 0005-boost.python-add-Library-include-and-lib-on-Win.patch
+    # Fixes compilation with Python 3.10, see also 
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1912903
+    - 0006-boost.python-py-fopen-private.patch
 
 build:
-  number: 11
+  number: 12
   # script_env:
   #   - CONDA_BUILD_DEBUG_BUILD_SYSTEM={{ debug_build_system }}
 
@@ -62,6 +65,8 @@ outputs:
       activate_in_script: True
       script_env:
         - CONDA_BUILD_DEBUG_BUILD_SYSTEM={{ debug_build_system }}
+      missing_dso_whitelist:
+        - '$RPATH/ld64.so.1'  # [s390x]
     script: install-libboost.sh   # [unix]
     script: install-libboost.bat  # [win]
     requirements:
@@ -238,10 +243,13 @@ outputs:
         - python
 
 about:
-  home: http://www.boost.org/
-  license: Boost-1.0
+  home: https://www.boost.org/
+  license: BSL-1.0
+  license_family: OTHER
   license_file: LICENSE_1_0.txt
   summary: Free peer-reviewed portable C++ source libraries.
+  dev_url: https://www.boost.org/doc/libs/{{ win_vstr }}/more/getting_started/index.html
+  doc_url: https://www.boost.org/doc/libs/{{ win_vstr }}/
 
 extra:
   recipe-maintainers:

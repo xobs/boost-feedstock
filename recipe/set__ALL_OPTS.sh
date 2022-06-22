@@ -23,6 +23,10 @@ elif [[ ${ARCH} == aarch64 ]]; then
 elif [[ ${ARCH} == s390x ]]; then
   _GENERIC_OPTS+=(address-model="64")
   _GENERIC_OPTS+=(architecture=s390x)
+# This is osx-arm64
+elif [[ ${ARCH} == arm64 ]]; then
+  _GENERIC_OPTS+=(address-model="64")
+  _GENERIC_OPTS+=(architecture=arm)
 else
   _GENERIC_OPTS+=(address-model="${ARCH}")
   _GENERIC_OPTS+=(architecture=x86)
@@ -53,14 +57,14 @@ _GENERIC_OPTS+=(--keep-going=false)
 _GENERIC_OPTS+=(-j${CPU_COUNT})
 
 declare -a _TP_OPTS=()
-if [[ ${target_platform} == osx-64 ]]; then
+if [[ ${target_platform} =~ osx.* ]]; then
   _TP_OPTS+=(target-os=darwin)
   # _TP_OPTS+=(binary-format=mach-o)
   # _TP_OPTS+=(abi=sysv)
   _TP_OPTS+=(threading=multi)
 fi
 
-if [[ ${target_platform} == osx-64 ]]; then
+if [[ ${target_platform} =~ osx.* ]]; then
   # See this comment in tools/build/src/tools/darwin.jam
   # "# - The archive builder (libtool is the default as creating
   #  #   archives in darwin is complicated."
