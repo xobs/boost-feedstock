@@ -87,6 +87,17 @@ outputs:
       files:
         - tests
       commands:
+        # Due to a bug introduced in 1.74.0 the following no longer work and so
+        # had to be removed; see https://github.com/boostorg/build/issues/677.
+        # - b2 --help
+        # - bjam --help
+        # - pushd tests
+        # -   pushd hello_world_cxx
+        # -     ./test.sh  # [not win and not (aarch64 or s390x)]
+        # -     test.bat  # [win]
+        # -   popd
+        # - popd
+
         # Verify Python headers are removed.
         - "! test -f $PREFIX/include/boost/python.hpp"                      # [unix]
         - "! test -d $PREFIX/include/boost/python"                          # [unix]
